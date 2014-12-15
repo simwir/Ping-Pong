@@ -63,6 +63,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 //activePointerID = event.getPointerId(0);
                 //TODO Fix the touch event so that it supports multitouch.
                 //Inspiration http://android-developers.blogspot.dk/2010/06/making-sense-of-multitouch.html
+                //Edit to create bleeding edge branch
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(p1PointerID != -1){
