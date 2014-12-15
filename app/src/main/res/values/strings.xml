@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ping Pong</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="bPong1Player">Pong 1 player</string>
+    <string name="bPong2Player">Pong 2 Players</string>
+    <string name="bJuggle">Juggle</string>
+    <string name="title_activity_pong_single_player">PongSinglePlayer</string>
+    <string name="title_activity_pong_two_player">PongTwoPlayer</string>
+    <string name="title_activity_juggle">Juggle</string>
+
+</resources>
