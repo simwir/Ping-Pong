@@ -166,17 +166,17 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 Canvas canvas = holder.lockCanvas();
                 canvas.drawRGB(0, 0, 0);
                 if(x1 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - 100, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - 50, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, 100, canvas.getWidth() / 2 + canvas.getWidth() / 8, 50, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
 
                 }
                 if(x1 != 0){
-                    canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - 100, x1 + canvas.getWidth() / 8, canvas.getHeight() - 50, greenPaint);
+                    canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, x1 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 != 0){
-                    canvas.drawRect(x2 - canvas.getWidth() / 8, 100, x2 + canvas.getWidth() / 8, 50, greenPaint);
+                    canvas.drawRect(x2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, x2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
                 }
                 holder.unlockCanvasAndPost(canvas);
             }
