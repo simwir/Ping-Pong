@@ -25,6 +25,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     private int p1PointerID = INVALID_POINTER_ID;
     private int p2PointerID = INVALID_POINTER_ID;
     int ballSpeed = 15;
+    int p1Score, p2Score;
 
 
     @Override
@@ -44,6 +45,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     protected void onStart(){
         super.onStart();
         createBall();
+        p1Score = p2Score = 0;
     }
 
     @Override
@@ -152,6 +154,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         Thread thread = null;
         boolean isRunning = false;
         Paint greenPaint = new Paint();
+        Paint whitePaint = new Paint();
 
         public PongSurface(Context context){
             super(context);
@@ -177,6 +180,10 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
             thread = new Thread(this);
             thread.start();
             greenPaint.setColor(Color.GREEN);
+            whitePaint.setColor(Color.WHITE);
+            whitePaint.setTextAlign(Paint.Align.CENTER);
+            whitePaint.setTextSize(metrics.widthPixels / 4);
+
         }
 
         @Override
@@ -187,6 +194,8 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
                 Canvas canvas = holder.lockCanvas();
                 canvas.drawRGB(0, 0, 0);
+                canvas.drawText(Integer.toString(p1Score), canvas.getWidth() / 2, canvas.getHeight() / 4 * 3 - metrics.widthPixels / 8, whitePaint);
+                canvas.drawText(Integer.toString(p2Score), canvas.getWidth() / 2, canvas.getHeight() / 4 + metrics.widthPixels / 8, whitePaint);
                 if(x1 == 0){
                     canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
@@ -211,8 +220,12 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
         private void moveBall(Canvas canvas){
 
-            if(by - br > canvas.getHeight() || by + br < 0){
+            if(by - br > canvas.getHeight()){
                 resetBall();
+                p2Score++;
+            }else if(by + br < 0){
+                resetBall();
+                p1Score++;
             }
 
             //Determent if the ball has hit the side
