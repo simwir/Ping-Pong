@@ -63,9 +63,38 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 //activePointerID = event.getPointerId(0);
                 //TODO Fix the touch event so that it supports multitouch.
                 //Inspiration http://android-developers.blogspot.dk/2010/06/making-sense-of-multitouch.html
-                //Edit to create bleeding edge branch
                 break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                //Gets the pointerIndex of this action
+                final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                //Gets the pointerId of this event
+                final int pointerId = event.getPointerId(pointerIndex);
+                //Determent if we already have a p1- or p2PointerId and if the press was on the top half or bottom
+                //It then assigns the pointerId to the player
+                if(p1PointerID != -1 && event.getY(pointerIndex)>metrics.heightPixels/2){
+                    x1 = event.getX(pointerIndex);
+                    p1PointerID = pointerId;
+                }else if(p2PointerID != -1 && event.getY(pointerIndex)<metrics.heightPixels/2){
+                    x2 = event.getX(pointerIndex);
+                    p2PointerID = pointerId;
+                }
+                break;
+
             case MotionEvent.ACTION_MOVE:
+                //Gets the pointerIndex of this action
+                final int pointerIndex2 = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                //Gets the pointerId of this event
+                final int pointerId2 = event.getPointerId(pointerIndex2);
+
+                //If the movement was from one of the active pointers it moves that paddle
+                if(p1PointerID == pointerId2){
+                    x1 = event.getX(pointerIndex2);
+                }else if(p2PointerID == pointerId2){
+                    x2 = event.getX(pointerIndex2);
+                }
+                /*
                 if(p1PointerID != -1){
                     final int p1PointerIndex = event.findPointerIndex(p1PointerID);
                     x1 = event.getX(p1PointerIndex);
@@ -73,7 +102,24 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                     final int p2PointerIndex = event.findPointerIndex(p2PointerID);
                     x2 = event.getX(p2PointerIndex);
                 }
+                */
                 break;
+            case MotionEvent.ACTION_POINTER_UP:
+                //Gets the pointerIndex of this action
+                final int pointerIndex3 = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                //Gets the pointerId of this event
+                final int pointerId3 = event.getPointerId(pointerIndex3);
+
+                //If the movement was from one of the active pointers it moves that paddle
+                if(p1PointerID == pointerId3){
+                    p1PointerID = INVALID_POINTER_ID;
+                }else if(p2PointerID == pointerId3){
+                    p2PointerID = INVALID_POINTER_ID;
+                }
+                break;
+
+
             case MotionEvent.ACTION_UP:
                 p1PointerID = INVALID_POINTER_ID;
                 p2PointerID = INVALID_POINTER_ID;
@@ -131,14 +177,15 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
         public void pause(){
             isRunning = false;
-            while(true){
+            //TODO is the while loop and break statement necessary
+            //while(true){
                 try{
                     thread.join();
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
-                break;
-            }
+                //break;
+            //}
             thread = null;
         }
 
