@@ -12,15 +12,19 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.util.Random;
+
 
 public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
     PongSurface surfaceView;
-    float x1, x2, sX1, y;
+    float x1, x2, bx, by, br;
+    boolean ballMoveDown, ballMoveRight;
     DisplayMetrics metrics;
     private static final int INVALID_POINTER_ID = -1;
     private int p1PointerID = INVALID_POINTER_ID;
     private int p2PointerID = INVALID_POINTER_ID;
+    int ballSpeed = 15;
 
 
     @Override
@@ -28,7 +32,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         super.onCreate(savedInstanceState);
         surfaceView = new PongSurface(this);
         surfaceView.setOnTouchListener(this);
-        x1 = x2 = sX1 = y = 0;
+        x1 = x2 = bx = by = 0;
         setContentView(surfaceView);
 
         metrics = new DisplayMetrics();
@@ -36,6 +40,23 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        createBall();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        surfaceView.pause();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        surfaceView.resume();
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event){
@@ -111,17 +132,18 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         return true;
     }
 
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        surfaceView.pause();
+    private void createBall(){
+        Random r = new Random();
+        resetBall();
+        ballSpeed = metrics.heightPixels / 140;
+        ballMoveDown = r.nextInt(2) == 1;
+        ballMoveRight = r.nextInt(2) == 1;
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-        surfaceView.resume();
+    private void resetBall(){
+        bx = metrics.widthPixels / 2;
+        by = metrics.heightPixels / 2;
+        br = metrics.heightPixels / 50;
     }
 
     public class PongSurface extends SurfaceView implements Runnable{
@@ -166,19 +188,60 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 Canvas canvas = holder.lockCanvas();
                 canvas.drawRGB(0, 0, 0);
                 if(x1 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - 100, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - 50, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, 100, canvas.getWidth() / 2 + canvas.getWidth() / 8, 50, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
 
                 }
                 if(x1 != 0){
-                    canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - 100, x1 + canvas.getWidth() / 8, canvas.getHeight() - 50, greenPaint);
+                    canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, x1 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 != 0){
-                    canvas.drawRect(x2 - canvas.getWidth() / 8, 100, x2 + canvas.getWidth() / 8, 50, greenPaint);
+                    canvas.drawRect(x2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, x2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
                 }
+
+                moveBall(canvas);
+
+                canvas.drawCircle(bx, by, br, greenPaint);
+
                 holder.unlockCanvasAndPost(canvas);
+            }
+        }
+
+        private void moveBall(Canvas canvas){
+
+            if(by - br > canvas.getHeight() || by + br < 0){
+                resetBall();
+            }
+
+            //Determent if the ball has hit the side
+            if(bx + br > canvas.getWidth()){
+                ballMoveRight = false;
+            }else if(bx - br < 0){
+                ballMoveRight = true;
+            }
+
+            //Determent if the ball has hit a paddle
+            if(by + br > canvas.getHeight() - (canvas.getHeight() / 25) * 2 && bx > x1 - canvas.getWidth() / 8 && bx < x1 + canvas.getWidth() / 8){
+                if(by - br < canvas.getHeight() - (canvas.getHeight() / 25) * 2){
+                    ballMoveDown = false;
+                }
+            }else if(by - br < (canvas.getHeight() / 25) * 2 && bx > x2 - canvas.getWidth() / 8 && bx < x2 + canvas.getWidth() / 8){
+                if(by + br > (canvas.getHeight() / 25) * 2){
+                    ballMoveDown = true;
+                }
+            }
+
+            if(ballMoveDown){
+                by += ballSpeed;
+            }else{
+                by -= ballSpeed;
+            }
+            if(ballMoveRight){
+                bx += ballSpeed;
+            }else{
+                bx -= ballSpeed;
             }
         }
     }
