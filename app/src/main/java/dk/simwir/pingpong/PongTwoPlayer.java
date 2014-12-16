@@ -2,8 +2,6 @@ package dk.simwir.pingpong;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,7 +17,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
     PongSurface surfaceView;
     float x1, x2, sX1, y;
-    Bitmap greenball;
     DisplayMetrics metrics;
     private static final int INVALID_POINTER_ID = -1;
     private int p1PointerID = INVALID_POINTER_ID;
@@ -32,7 +29,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         surfaceView = new PongSurface(this);
         surfaceView.setOnTouchListener(this);
         x1 = x2 = sX1 = y = 0;
-        greenball = BitmapFactory.decodeResource(getResources(), R.drawable.greenball);
         setContentView(surfaceView);
 
         metrics = new DisplayMetrics();
@@ -56,23 +52,52 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                     x1 = event.getX();
                     p1PointerID = event.getPointerId(0);
                 }else if(event.getY() < metrics.heightPixels / 2){
+
                     x2 = event.getX();
                     p2PointerID = event.getPointerId(0);
                 }
-
-                //activePointerID = event.getPointerId(0);
-                //TODO Fix the touch event so that it supports multitouch.
-                //Inspiration http://android-developers.blogspot.dk/2010/06/making-sense-of-multitouch.html
                 break;
-            case MotionEvent.ACTION_MOVE:
-                if(p1PointerID != -1){
-                    final int p1PointerIndex = event.findPointerIndex(p1PointerID);
-                    x1 = event.getX(p1PointerIndex);
-                }else if(p2PointerID != -1){
-                    final int p2PointerIndex = event.findPointerIndex(p2PointerID);
-                    x2 = event.getX(p2PointerIndex);
+            case MotionEvent.ACTION_POINTER_DOWN:
+                //Gets the pointerIndex of this action
+                final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                //Gets the pointerId of this event
+                final int pointerId = event.getPointerId(pointerIndex);
+                //Determent if we already have a p1- or p2PointerId and if the press was on the top half or bottom
+                //It then assigns the pointerId to the player
+                if(p1PointerID == -1 && event.getY(pointerIndex) > metrics.heightPixels / 2){
+                    x1 = event.getX(pointerIndex);
+                    p1PointerID = pointerId;
+                }else if(p2PointerID == -1 && event.getY(pointerIndex) < metrics.heightPixels / 2){
+                    x2 = event.getX(pointerIndex);
+                    p2PointerID = pointerId;
                 }
                 break;
+
+            case MotionEvent.ACTION_MOVE:
+                if(p1PointerID != -1){
+                    x1 = event.getX(event.findPointerIndex(p1PointerID));
+                }
+                if(p2PointerID != -1){
+                    x2 = event.getX(event.findPointerIndex(p2PointerID));
+                }
+                break;
+
+            case MotionEvent.ACTION_POINTER_UP:
+                //Gets the pointerIndex of this action
+                final int pointerIndex2 = (action&MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                //Gets the pointerId of this event
+                final int pointerId2 = event.getPointerId(pointerIndex2);
+                //If the movement was from one of the active pointers it moves that paddle
+                if(p1PointerID == pointerId2){
+                    p1PointerID = INVALID_POINTER_ID;
+                }else if(p2PointerID == pointerId2){
+                    p2PointerID = INVALID_POINTER_ID;
+                }
+                break;
+
+
             case MotionEvent.ACTION_UP:
                 p1PointerID = INVALID_POINTER_ID;
                 p2PointerID = INVALID_POINTER_ID;
@@ -83,23 +108,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 break;
 
         }
-        /*
-        if(event.getY() > metrics.heightPixels / 2){
-            x1 = event.getX();
-        }else if(event.getY() < metrics.heightPixels / 2){
-            x2 = event.getX();
-        }
-
-        switch(event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                sX1 = event.getX();
-
-                break;
-            case MotionEvent.ACTION_UP:
-                y = 0;
-                break;
-        }
-        */
         return true;
     }
 
@@ -130,14 +138,15 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
         public void pause(){
             isRunning = false;
-            while(true){
+            //TODO is the while loop and break statement necessary
+            //while(true){
                 try{
                     thread.join();
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
-                break;
-            }
+                //break;
+            //}
             thread = null;
         }
 
@@ -156,16 +165,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
                 Canvas canvas = holder.lockCanvas();
                 canvas.drawRGB(0, 0, 0);
-                /*
-                TODO implement this, but for a rectangle
-                if(x1!=0){
-                    canvas.drawBitmap(greenball, x1-greenball.getWidth()/2, canvas.getHeight()-100, null);
-                }
-                if(x2!=0){
-                    canvas.drawBitmap(greenball, x2-greenball.getWidth()/2, 100, null);
-                }
-                */
-                //if()
                 if(x1 == 0){
                     canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - 100, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - 50, greenPaint);
                 }
