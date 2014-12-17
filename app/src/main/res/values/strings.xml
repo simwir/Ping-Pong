@@ -11,5 +11,8 @@
     <string name="title_activity_pong_single_player">PongSinglePlayer</string>
     <string name="title_activity_pong_two_player">PongTwoPlayer</string>
     <string name="title_activity_juggle">Juggle</string>
+    <string name="dialog_pong2player_open_settings">Open settings?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

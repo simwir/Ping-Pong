@@ -1,7 +1,10 @@
 package dk.simwir.pingpong;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,8 +17,10 @@ import android.view.View;
 
 import java.util.Random;
 
+import dk.simwir.pingpong.dialogs.PongTwoPlayerDialogFragment;
 
-public class PongTwoPlayer extends Activity implements View.OnTouchListener{
+
+public class PongTwoPlayer extends Activity implements View.OnTouchListener, PongTwoPlayerDialogFragment.NoticeDialogListener{
 
     PongSurface surfaceView;
     float x1, x2, bx, by, br;
@@ -26,6 +31,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     private int p2PointerID = INVALID_POINTER_ID;
     int ballSpeed = 15;
     int p1Score, p2Score;
+    Bitmap settings;
 
 
     @Override
@@ -39,6 +45,8 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+        settings = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_settings);
+
     }
 
     @Override
@@ -50,6 +58,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
 
     @Override
     protected void onPause(){
+        //TODO Make the activity pause when the dialog is opened.
         super.onPause();
         surfaceView.pause();
     }
@@ -79,6 +88,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                     x2 = event.getX();
                     p2PointerID = event.getPointerId(0);
                 }
+                isSettingsClicked(event, 0);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 //Gets the pointerIndex of this action
@@ -95,6 +105,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                     x2 = event.getX(pointerIndex);
                     p2PointerID = pointerId;
                 }
+                isSettingsClicked(event, pointerIndex);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -134,6 +145,15 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         return true;
     }
 
+    private void isSettingsClicked(MotionEvent event, int pointerIndex){
+        if(event.getY(pointerIndex) > metrics.heightPixels / 2 - settings.getHeight() / 2 && event.getY(pointerIndex) < metrics.heightPixels / 2 + settings.getHeight() / 2){
+            if(event.getX(pointerIndex) > metrics.widthPixels - settings.getWidth() && event.getX(pointerIndex) < metrics.widthPixels){
+                DialogFragment newFragment = new PongTwoPlayerDialogFragment();
+                newFragment.show(getFragmentManager(), "settings");
+            }
+        }
+    }
+
     private void createBall(){
         Random r = new Random();
         resetBall();
@@ -146,6 +166,16 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         bx = metrics.widthPixels / 2;
         by = metrics.heightPixels / 2;
         br = metrics.heightPixels / 50;
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog){
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog){
+
     }
 
     public class PongSurface extends SurfaceView implements Runnable{
@@ -164,14 +194,15 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         public void pause(){
             isRunning = false;
             //TODO is the while loop and break statement necessary
-            //while(true){
+            while(true){
                 try{
                     thread.join();
+                    break;
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
-                //break;
-            //}
+
+            }
             thread = null;
         }
 
@@ -196,6 +227,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
                 canvas.drawRGB(0, 0, 0);
                 canvas.drawText(Integer.toString(p1Score), canvas.getWidth() / 2, canvas.getHeight() / 4 * 3 - metrics.widthPixels / 8, whitePaint);
                 canvas.drawText(Integer.toString(p2Score), canvas.getWidth() / 2, canvas.getHeight() / 4 + metrics.widthPixels / 8, whitePaint);
+                canvas.drawBitmap(settings, canvas.getWidth() - settings.getWidth(), canvas.getHeight() / 2 - settings.getHeight() / 2, null);
                 if(x1 == 0){
                     canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
