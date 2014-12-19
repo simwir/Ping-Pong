@@ -74,12 +74,13 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
 
     @Override
     public boolean onTouch(View v, MotionEvent event){
-
+        /*
         try{
             Thread.sleep(50);
         }catch(InterruptedException e){
             e.printStackTrace();
         }
+        */
         final int action = event.getAction();
         switch(action&MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_DOWN:

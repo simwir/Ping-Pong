@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:ems="3"
                 android:id="@+id/etBallSpeed"
                 android:text="0.7"/>
