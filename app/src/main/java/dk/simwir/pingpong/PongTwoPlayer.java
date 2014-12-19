@@ -3,6 +3,7 @@ package dk.simwir.pingpong;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -26,12 +27,14 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
     float x1, x2, bx, by, br;
     boolean ballMoveDown, ballMoveRight;
     DisplayMetrics metrics;
-    private static final int INVALID_POINTER_ID = -1;
     private int p1PointerID = INVALID_POINTER_ID;
     private int p2PointerID = INVALID_POINTER_ID;
     int ballSpeed = 15;
     int p1Score, p2Score;
     Bitmap settings;
+
+    private static final int INVALID_POINTER_ID = -1;
+    static final int SETTINGS_REQUEST = 1;
 
 
     @Override
@@ -170,11 +173,24 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog){
-
+        Intent startSettings = new Intent(PongTwoPlayer.this, PongTwoPlayerSettings.class);
+        startActivityForResult(startSettings, SETTINGS_REQUEST);
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog){
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch(requestCode){
+            case SETTINGS_REQUEST:
+                if(resultCode == RESULT_OK){
+                    //TODO handle the intent data here
+                }
+                break;
+        }
 
     }
 

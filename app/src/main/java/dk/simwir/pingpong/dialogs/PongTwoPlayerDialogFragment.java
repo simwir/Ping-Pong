@@ -14,12 +14,12 @@ public class PongTwoPlayerDialogFragment extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(R.string.dialog_pong2player_open_settings).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+        builder.setMessage(R.string.dialog_pong2player_open_settings).setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which){
                 mListener.onDialogPositiveClick(PongTwoPlayerDialogFragment.this);
             }
-        }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener(){
+        }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which){
                 mListener.onDialogNegativeClick(PongTwoPlayerDialogFragment.this);
