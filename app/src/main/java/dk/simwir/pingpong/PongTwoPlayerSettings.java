@@ -2,8 +2,10 @@ package dk.simwir.pingpong;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,11 +17,16 @@ public class PongTwoPlayerSettings extends Activity implements SeekBar.OnSeekBar
     SeekBar sbPaddleSize, sbBallSpeed, sbBallSize;
     EditText etPaddleSize, etBallSpeed, etBallSize;
     Button bOk, bCancel;
-    int paddleSize, ballSpeed, ballSize;
+    int paddleSize, ballSize, ballSpeed;
 
     public static final String PADDLE_SIZE = "paddleSize";
     public static final String BALL_SPEED = "ballSpeed";
     public static final String BALL_SIZE = "ballSize";
+
+    public static final String SETTINGS_CHANGED_BUNDLE = "settingsChanged";
+    public static final String SETTINGS_CHANGED_EXTRAS = "extras";
+
+    private static final String TAG = "PongTwoPlayerSettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -56,44 +63,68 @@ public class PongTwoPlayerSettings extends Activity implements SeekBar.OnSeekBar
     }
 
     private void savePrefs(){
+        Log.d(TAG, "Saving preferences");
         SharedPreferences pref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(PADDLE_SIZE, Integer.parseInt(etPaddleSize.getText().toString()));
         editor.putInt(BALL_SPEED, Integer.parseInt(etBallSpeed.getText().toString()));
         editor.putInt(BALL_SIZE, Integer.parseInt(etPaddleSize.getText().toString()));
-
+        editor.apply();
+        Log.d(TAG, "Preferences saved");
 
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+        Log.d(TAG, "Progress Changes");
         switch(seekBar.getId()){
             case R.id.sbPaddleSize:
+                Log.d(TAG, "Paddle size changed to " + progress);
                 etPaddleSize.setText(Integer.toString(progress));
                 break;
             case R.id.sbBallSpeed:
-                etBallSpeed.setText(Integer.toString(progress / 100));
+                Log.d(TAG, "Ball speed changed to " + progress);
+                // etBallSpeed.setText(Integer.toString(progress / 100));
+                etBallSpeed.setText(Double.toString((double) progress / 100));
                 break;
             case R.id.sbBallSize:
+                Log.d(TAG, "Ball size changed to " + progress);
                 etBallSize.setText(Integer.toString(progress));
                 break;
         }
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar){}
+    public void onStartTrackingTouch(SeekBar seekBar){
+        Log.d(TAG, "Tracking started");
+    }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar){}
+    public void onStopTrackingTouch(SeekBar seekBar){
+        Log.d(TAG, "Tracking ended");
+    }
 
     @Override
     public void onClick(View v){
         switch(v.getId()){
             case R.id.bP2POk:
+                Log.d(TAG, "OK, clicked");
                 savePrefs();
+                Intent returnIntent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(SETTINGS_CHANGED_BUNDLE, true);
+                bundle.putInt(PADDLE_SIZE, Integer.parseInt(etPaddleSize.getText().toString()));
+                bundle.putInt(BALL_SPEED, Integer.parseInt(etBallSpeed.getText().toString()));
+                bundle.putInt(BALL_SIZE, Integer.parseInt(etPaddleSize.getText().toString()));
+                returnIntent.putExtra(SETTINGS_CHANGED_EXTRAS, bundle);
+                setResult(RESULT_OK, returnIntent);
+                Log.d(TAG, "Intent returned");
+                finish();
                 break;
             case R.id.bP2PCancel:
-
+                Log.d(TAG, "Cancel pressed");
+                setResult(RESULT_CANCELED);
+                finish();
                 break;
         }
     }
