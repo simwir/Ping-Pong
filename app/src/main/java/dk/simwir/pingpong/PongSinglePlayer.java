@@ -18,11 +18,12 @@ import java.util.Random;
 public class PongSinglePlayer extends Activity implements View.OnTouchListener{
 
     PongSurface surfaceView;
-    float x1, x2, bx, by, br;
+    float x1, x2, bx, by, br, ballHitTop;
     DisplayMetrics metrics;
     int p1Score, p2Score;
-    boolean ballMoveDown, ballMoveRight;
+    boolean ballMoveDown, ballMoveRight, ballHitTopCalculated, aiPaddleInPlace;
     int ballSpeed = 15;
+    int aiDifficulty = 50;
 
 
     @Override
@@ -49,6 +50,8 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
         bx = metrics.widthPixels / 2;
         by = metrics.heightPixels / 2;
         br = metrics.heightPixels / 50;
+        ballHitTopCalculated = false;
+        aiPaddleInPlace = false;
     }
 
     @Override
@@ -56,6 +59,8 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
         super.onStart();
         createBall();
         p1Score = p2Score = 0;
+        ballHitTop = 0;
+        x2 = metrics.widthPixels;
     }
 
     @Override
@@ -137,12 +142,141 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
                 if(x1 == 0){
                     canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
+                if(x2 == 0){
+                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
+
+                }
                 if(x1 != 0){
                     canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, x1 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
+                if(x2 != 0){
+                    canvas.drawRect(x2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, x2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
+                }
+                moveBall(canvas);
+
+                moveAIPaddle(canvas);
+
+                canvas.drawCircle(bx, by, br, greenPaint);
 
                 holder.unlockCanvasAndPost(canvas);
 
+            }
+
+
+        }
+
+        private void moveAIPaddle(Canvas canvas){
+            Random r = new Random();
+            if(!ballHitTopCalculated){
+                float x = bx;
+                float y = by;
+                boolean ballMoveRight2 = ballMoveRight;
+                while(true){
+                    if(!ballMoveDown){
+                        if(ballMoveRight2){
+                            if(x + y < canvas.getWidth() - br){
+                                ballHitTop = x + y - canvas.getHeight() / 25;
+                                ballHitTopCalculated = true;
+                                if(r.nextInt(aiDifficulty) == 0){
+                                    if(ballHitTop < canvas.getWidth() / 2){
+                                        ballHitTop = ballHitTop + canvas.getWidth() / 2;
+                                    }else{
+                                        ballHitTop = ballHitTop - canvas.getWidth() / 2;
+                                    }
+                                }
+                                break;
+                            }else{
+                                y = y - canvas.getWidth() + x - br;
+                                x = canvas.getWidth() - br;
+                                ballMoveRight2 = false;
+                            }
+                        }else{
+                            if(x - y > 0 + br){
+                                ballHitTop = x - y;
+                                ballHitTopCalculated = true;
+                                if(r.nextInt(aiDifficulty) == 0){
+                                    if(ballHitTop < canvas.getWidth() / 2){
+                                        ballHitTop = ballHitTop + canvas.getWidth() / 2;
+                                    }else{
+                                        ballHitTop = ballHitTop - canvas.getWidth() / 2;
+                                    }
+                                }
+                                break;
+                            }else{
+                                y = y - x + br;
+                                x = 0 + br;
+                                ballMoveRight2 = true;
+                            }
+                        }
+                    }else{
+                        break;
+                    }
+                }
+            }
+
+            if(ballHitTop != 0){
+                if(!aiPaddleInPlace){
+                    if(x2 <= ballHitTop){
+                        if(x2 + 50 > ballHitTop){
+                            x2++;
+                        }else{
+                            x2 = x2 + ballSpeed;
+                        }
+                    }else{
+                        if(x2 + 50 < ballHitTop){
+                            x2--;
+                        }else{
+                            x2 = x2 - ballSpeed;
+                        }
+                    }
+                }
+            }
+            if(x2 == ballHitTop){
+                aiPaddleInPlace = true;
+            }
+
+
+        }
+
+        private void moveBall(Canvas canvas){
+            if(by - br > canvas.getHeight()){
+                resetBall();
+                p2Score++;
+            }else if(by + br < 0){
+                resetBall();
+                p1Score++;
+            }
+
+            //Determent if the ball has hit the side
+            if(bx + br > canvas.getWidth()){
+                ballMoveRight = false;
+            }else if(bx - br < 0){
+                ballMoveRight = true;
+            }
+
+            //Determent if the ball has hit a paddle
+            if(by + br > canvas.getHeight() - (canvas.getHeight() / 25) * 2 && bx > x1 - canvas.getWidth() / 8 && bx < x1 + canvas.getWidth() / 8){
+                if(by - br < canvas.getHeight() - (canvas.getHeight() / 25) * 2){
+                    ballMoveDown = false;
+                    aiPaddleInPlace = false;
+                }
+            }else if(by - br < (canvas.getHeight() / 25) * 2 && bx > x2 - canvas.getWidth() / 8 && bx < x2 + canvas.getWidth() / 8){
+                if(by + br > (canvas.getHeight() / 25) * 2){
+                    ballMoveDown = true;
+                    ballHitTopCalculated = false;
+
+                }
+            }
+
+            if(ballMoveDown){
+                by += ballSpeed;
+            }else{
+                by -= ballSpeed;
+            }
+            if(ballMoveRight){
+                bx += ballSpeed;
+            }else{
+                bx -= ballSpeed;
             }
         }
     }
