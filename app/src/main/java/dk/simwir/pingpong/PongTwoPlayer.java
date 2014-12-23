@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,14 +22,15 @@ import dk.simwir.pingpong.dialogs.PongTwoPlayerDialogFragment;
 public class PongTwoPlayer extends Activity implements View.OnTouchListener, PongTwoPlayerDialogFragment.NoticeDialogListener{
 
     PongSurface surfaceView;
-    float x1, x2, bx, by, br;
+    float x1, x2, bx, by, br, paddleSize;
     boolean ballMoveDown, ballMoveRight;
     DisplayMetrics metrics;
     private int p1PointerID = INVALID_POINTER_ID;
     private int p2PointerID = INVALID_POINTER_ID;
-    int ballSpeed = 15;
     int p1Score, p2Score;
-    Bitmap settings;
+    double ballSpeed;
+    Intent intent;
+    Bundle bundle;
 
     private static final int INVALID_POINTER_ID = -1;
     static final int SETTINGS_REQUEST = 1;
@@ -40,16 +39,35 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        intent = getIntent();
+        bundle = intent.getBundleExtra(PongTwoPlayerSettings.SETTINGS_EXTRAS);
         surfaceView = new PongSurface(this);
         surfaceView.setOnTouchListener(this);
         x1 = x2 = bx = by = 0;
         setContentView(surfaceView);
 
+
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        settings = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_settings);
+        setValues();
 
+
+
+    }
+
+    private void setValues(){
+        paddleSize = metrics.widthPixels * bundle.getInt(PongTwoPlayerSettings.PADDLE_SIZE, PongTwoPlayerSettings.DEFAULT_PADDLE_SIZE) / 100;
+        ballSpeed = getBallSpeed();
+        br = getBallRadius();
+    }
+
+    private double getBallSpeed(){
+        return bundle.getInt(PongTwoPlayerSettings.BALL_SPEED, PongTwoPlayerSettings.DEFAULT_BALL_SPEED) / 100;
+    }
+
+    private float getBallRadius(){
+        return metrics.heightPixels * bundle.getInt(PongTwoPlayerSettings.BALL_SIZE, PongTwoPlayerSettings.DEFAULT_BALL_SIZE) / 100;
     }
 
     @Override
@@ -92,7 +110,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
                     x2 = event.getX();
                     p2PointerID = event.getPointerId(0);
                 }
-                isSettingsClicked(event, 0);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 //Gets the pointerIndex of this action
@@ -109,7 +126,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
                     x2 = event.getX(pointerIndex);
                     p2PointerID = pointerId;
                 }
-                isSettingsClicked(event, pointerIndex);
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -149,19 +165,20 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
         return true;
     }
 
-    private void isSettingsClicked(MotionEvent event, int pointerIndex){
-        if(event.getY(pointerIndex) > metrics.heightPixels / 2 - settings.getHeight() / 2 && event.getY(pointerIndex) < metrics.heightPixels / 2 + settings.getHeight() / 2){
-            if(event.getX(pointerIndex) > metrics.widthPixels - settings.getWidth() && event.getX(pointerIndex) < metrics.widthPixels){
-                DialogFragment newFragment = new PongTwoPlayerDialogFragment();
-                newFragment.show(getFragmentManager(), "settings");
+    /*
+        private void isSettingsClicked(MotionEvent event, int pointerIndex){
+            if(event.getY(pointerIndex) > metrics.heightPixels / 2 - settings.getHeight() / 2 && event.getY(pointerIndex) < metrics.heightPixels / 2 + settings.getHeight() / 2){
+                if(event.getX(pointerIndex) > metrics.widthPixels - settings.getWidth() && event.getX(pointerIndex) < metrics.widthPixels){
+                    DialogFragment newFragment = new PongTwoPlayerDialogFragment();
+                    newFragment.show(getFragmentManager(), "settings");
+                }
             }
         }
-    }
-
+    */
     private void createBall(){
         Random r = new Random();
         resetBall();
-        ballSpeed = metrics.heightPixels / 140;
+        ballSpeed = getBallSpeed();
         ballMoveDown = r.nextInt(2) == 1;
         ballMoveRight = r.nextInt(2) == 1;
     }
@@ -169,7 +186,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
     private void resetBall(){
         bx = metrics.widthPixels / 2;
         by = metrics.heightPixels / 2;
-        br = metrics.heightPixels / 50;
+        br = getBallRadius();
     }
 
     @Override
@@ -180,18 +197,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog){
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        switch(requestCode){
-            case SETTINGS_REQUEST:
-                if(resultCode == RESULT_OK){
-                    //TODO handle the intent data here
-                }
-                break;
-        }
 
     }
 
@@ -244,19 +249,18 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
                 canvas.drawRGB(0, 0, 0);
                 canvas.drawText(Integer.toString(p1Score), canvas.getWidth() / 2, canvas.getHeight() / 4 * 3 - metrics.widthPixels / 8, whitePaint);
                 canvas.drawText(Integer.toString(p2Score), canvas.getWidth() / 2, canvas.getHeight() / 4 + metrics.widthPixels / 8, whitePaint);
-                canvas.drawBitmap(settings, canvas.getWidth() - settings.getWidth(), canvas.getHeight() / 2 - settings.getHeight() / 2, null);
                 if(x1 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - paddleSize / 2, canvas.getHeight() - (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + paddleSize / 2, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 == 0){
-                    canvas.drawRect(canvas.getWidth() / 2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
+                    canvas.drawRect(canvas.getWidth() / 2 - paddleSize / 2, (canvas.getHeight() / 25) * 2, canvas.getWidth() / 2 + paddleSize / 2, canvas.getHeight() / 25, greenPaint);
 
                 }
                 if(x1 != 0){
-                    canvas.drawRect(x1 - canvas.getWidth() / 8, canvas.getHeight() - (canvas.getHeight() / 25) * 2, x1 + canvas.getWidth() / 8, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
+                    canvas.drawRect(x1 - paddleSize / 2, canvas.getHeight() - (canvas.getHeight() / 25) * 2, x1 + paddleSize / 2, canvas.getHeight() - canvas.getHeight() / 25, greenPaint);
                 }
                 if(x2 != 0){
-                    canvas.drawRect(x2 - canvas.getWidth() / 8, (canvas.getHeight() / 25) * 2, x2 + canvas.getWidth() / 8, canvas.getHeight() / 25, greenPaint);
+                    canvas.drawRect(x2 - paddleSize / 2, (canvas.getHeight() / 25) * 2, x2 + paddleSize / 2, canvas.getHeight() / 25, greenPaint);
                 }
 
                 moveBall(canvas);
@@ -285,11 +289,11 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
             }
 
             //Determent if the ball has hit a paddle
-            if(by + br > canvas.getHeight() - (canvas.getHeight() / 25) * 2 && bx > x1 - canvas.getWidth() / 8 && bx < x1 + canvas.getWidth() / 8){
+            if(by + br > canvas.getHeight() - (canvas.getHeight() / 25) * 2 && bx > x1 - paddleSize / 2 && bx < x1 + paddleSize / 2){
                 if(by - br < canvas.getHeight() - (canvas.getHeight() / 25) * 2){
                     ballMoveDown = false;
                 }
-            }else if(by - br < (canvas.getHeight() / 25) * 2 && bx > x2 - canvas.getWidth() / 8 && bx < x2 + canvas.getWidth() / 8){
+            }else if(by - br < (canvas.getHeight() / 25) * 2 && bx > x2 - paddleSize / 2 && bx < x2 + paddleSize / 2){
                 if(by + br > (canvas.getHeight() / 25) * 2){
                     ballMoveDown = true;
                 }
