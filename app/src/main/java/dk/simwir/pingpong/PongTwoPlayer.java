@@ -26,6 +26,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     private int p2PointerID = INVALID_POINTER_ID;
     int ballSpeed = 15;
     int p1Score, p2Score;
+    long startTime;
 
 
     @Override
@@ -46,6 +47,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         super.onStart();
         createBall();
         p1Score = p2Score = 0;
+
     }
 
     @Override
@@ -63,11 +65,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     @Override
     public boolean onTouch(View v, MotionEvent event){
 
-        try{
-            Thread.sleep(50);
-        }catch(InterruptedException e){
-            e.printStackTrace();
-        }
         final int action = event.getAction();
         switch(action&MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_DOWN:
@@ -146,6 +143,16 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         bx = metrics.widthPixels / 2;
         by = metrics.heightPixels / 2;
         br = metrics.heightPixels / 50;
+        startTime = System.currentTimeMillis();
+    }
+
+    private float getBallSpeed(){
+        float speedUp = ballSpeed * (System.currentTimeMillis() - startTime) / 10000;
+        if(speedUp > ballSpeed){
+            return speedUp;
+        }else{
+            return ballSpeed;
+        }
     }
 
     public class PongSurface extends SurfaceView implements Runnable{
@@ -247,15 +254,17 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
             }
 
             if(ballMoveDown){
-                by += ballSpeed;
+                by += getBallSpeed();
             }else{
-                by -= ballSpeed;
+                by -= getBallSpeed();
             }
             if(ballMoveRight){
-                bx += ballSpeed;
+                bx += getBallSpeed();
             }else{
-                bx -= ballSpeed;
+                bx -= getBallSpeed();
             }
         }
     }
+
+
 }
