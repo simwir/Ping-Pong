@@ -175,7 +175,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
     private void showWinnerDialog(int winner){
         DialogFragment newFragment = PongTwoPlayerWinDialogFragment.newInstance(winner);
         newFragment.show(getFragmentManager(), "winner");
-
+        newFragment.setCancelable(false);
         surfaceView.pause();
     }
 
