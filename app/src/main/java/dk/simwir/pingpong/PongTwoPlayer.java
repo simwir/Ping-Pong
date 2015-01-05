@@ -1,6 +1,7 @@
 package dk.simwir.pingpong;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,8 +15,10 @@ import android.view.View;
 
 import java.util.Random;
 
+import dk.simwir.pingpong.dialogs.PongTwoPlayerWinDialogFragment;
 
-public class PongTwoPlayer extends Activity implements View.OnTouchListener{
+
+public class PongTwoPlayer extends Activity implements View.OnTouchListener, PongTwoPlayerWinDialogFragment.WinnerDialogListener{
 
     PongSurface surfaceView;
     float x1, x2, bx, by, br;
@@ -26,6 +29,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     private int p2PointerID = INVALID_POINTER_ID;
     int ballSpeed = 15;
     int p1Score, p2Score;
+    long startTime;
 
 
     @Override
@@ -46,6 +50,13 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         super.onStart();
         createBall();
         p1Score = p2Score = 0;
+
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        surfaceView.stop();
     }
 
     @Override
@@ -63,11 +74,6 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
     @Override
     public boolean onTouch(View v, MotionEvent event){
 
-        try{
-            Thread.sleep(50);
-        }catch(InterruptedException e){
-            e.printStackTrace();
-        }
         final int action = event.getAction();
         switch(action&MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_DOWN:
@@ -146,6 +152,44 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
         bx = metrics.widthPixels / 2;
         by = metrics.heightPixels / 2;
         br = metrics.heightPixels / 50;
+        startTime = System.currentTimeMillis();
+    }
+
+    private float getBallSpeed(){
+        float speedUp = ballSpeed * (System.currentTimeMillis() - startTime) / 10000;
+        if(speedUp > ballSpeed){
+            return speedUp;
+        }else{
+            return ballSpeed;
+        }
+    }
+
+    private void haveWon(){
+        if(p1Score > 10){
+            showWinnerDialog(1);
+        }else if(p2Score > 10){
+            showWinnerDialog(2);
+        }
+    }
+
+    private void showWinnerDialog(int winner){
+        DialogFragment newFragment = PongTwoPlayerWinDialogFragment.newInstance(winner);
+        newFragment.show(getFragmentManager(), "winner");
+        newFragment.setCancelable(false);
+        surfaceView.pause();
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog){
+        surfaceView.resume();
+        createBall();
+        p1Score = 0;
+        p2Score = 0;
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog){
+        finish();
     }
 
     public class PongSurface extends SurfaceView implements Runnable{
@@ -161,24 +205,27 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
             holder = getHolder();
         }
 
-        public void pause(){
-            isRunning = false;
-            //TODO is the while loop and break statement necessary
+        public void stop(){
             //while(true){
-                try{
-                    thread.join();
-                }catch(InterruptedException e){
-                    e.printStackTrace();
-                }
-                //break;
+            try{
+                thread.join();
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            //break;
             //}
             thread = null;
+        }
+
+        public void pause(){
+            isRunning = false;
         }
 
         public void resume(){
             isRunning = true;
             thread = new Thread(this);
             thread.start();
+
             greenPaint.setColor(Color.GREEN);
             whitePaint.setColor(Color.WHITE);
             whitePaint.setTextAlign(Paint.Align.CENTER);
@@ -223,9 +270,11 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
             if(by - br > canvas.getHeight()){
                 resetBall();
                 p2Score++;
+                haveWon();
             }else if(by + br < 0){
                 resetBall();
                 p1Score++;
+                haveWon();
             }
 
             //Determent if the ball has hit the side
@@ -247,15 +296,17 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener{
             }
 
             if(ballMoveDown){
-                by += ballSpeed;
+                by += getBallSpeed();
             }else{
-                by -= ballSpeed;
+                by -= getBallSpeed();
             }
             if(ballMoveRight){
-                bx += ballSpeed;
+                bx += getBallSpeed();
             }else{
-                bx -= ballSpeed;
+                bx -= getBallSpeed();
             }
         }
     }
+
+
 }
