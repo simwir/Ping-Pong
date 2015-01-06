@@ -6,7 +6,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -22,13 +22,18 @@
         </activity>
         <activity
             android:name=".PongTwoPlayer"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_pong_two_player"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation|screenSize">>
+            android:screenOrientation="portrait" >
+>
         </activity>
         <activity
             android:name=".Juggle"
             android:label="@string/title_activity_juggle" >
+        </activity>
+        <activity
+            android:name=".Wall"
+            android:label="@string/title_activity_wall" >
         </activity>
     </application>
 
