@@ -1,6 +1,7 @@
 package dk.simwir.pingpong;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,8 +15,10 @@ import android.view.View;
 
 import java.util.Random;
 
+import dk.simwir.pingpong.dialogs.PongSinglePlayerWinDialogFragment;
 
-public class PongSinglePlayer extends Activity implements View.OnTouchListener{
+
+public class PongSinglePlayer extends Activity implements View.OnTouchListener, PongSinglePlayerWinDialogFragment.WinnerDialogListener{
 
     PongSurface surfaceView;
     float x1, x2, bx, by, br, ballHitTop;
@@ -23,8 +26,8 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
     int p1Score, p2Score;
     boolean ballMoveDown, ballMoveRight, ballHitTopCalculated, aiPaddleInPlace;
     int ballSpeed = 15;
-    int aiDifficulty = 50;
-
+    int aiDifficulty = 20;
+    long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -52,6 +55,16 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
         br = metrics.heightPixels / 50;
         ballHitTopCalculated = false;
         aiPaddleInPlace = false;
+        startTime = System.currentTimeMillis();
+    }
+
+    private float getBallSpeed(){
+        float speedUp = ballSpeed * (System.currentTimeMillis() - startTime) / 10000;
+        if(speedUp > ballSpeed){
+            return speedUp;
+        }else{
+            return ballSpeed;
+        }
     }
 
     @Override
@@ -61,6 +74,12 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
         p1Score = p2Score = 0;
         ballHitTop = 0;
         x2 = metrics.widthPixels;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        surfaceView.stop();
     }
 
     @Override
@@ -90,6 +109,34 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
         return true;
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog){
+        surfaceView.resume();
+        createBall();
+        p1Score = 0;
+        p2Score = 0;
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog){
+        finish();
+    }
+
+    private void haveWon(){
+        if(p1Score > 10){
+            showWinnerDialog(true);
+        }else if(p2Score > 10){
+            showWinnerDialog(false);
+        }
+    }
+
+    private void showWinnerDialog(boolean playerWin){
+        DialogFragment newFragment = PongSinglePlayerWinDialogFragment.newInstance(playerWin);
+        newFragment.show(getFragmentManager(), "winner");
+        newFragment.setCancelable(false);
+        surfaceView.pause();
+    }
+
 
     public class PongSurface extends SurfaceView implements Runnable{
 
@@ -104,9 +151,7 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
             holder = getHolder();
         }
 
-        public void pause(){
-            isRunning = false;
-            //TODO is the while loop and break statement necessary
+        public void stop(){
             //while(true){
             try{
                 thread.join();
@@ -116,6 +161,10 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
             //break;
             //}
             thread = null;
+        }
+
+        public void pause(){
+            isRunning = false;
         }
 
         public void resume(){
@@ -242,9 +291,11 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
             if(by - br > canvas.getHeight()){
                 resetBall();
                 p2Score++;
+                haveWon();
             }else if(by + br < 0){
                 resetBall();
                 p1Score++;
+                haveWon();
             }
 
             //Determent if the ball has hit the side
@@ -269,14 +320,14 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener{
             }
 
             if(ballMoveDown){
-                by += ballSpeed;
+                by += getBallSpeed();
             }else{
-                by -= ballSpeed;
+                by -= getBallSpeed();
             }
             if(ballMoveRight){
-                bx += ballSpeed;
+                bx += getBallSpeed();
             }else{
-                bx -= ballSpeed;
+                bx -= getBallSpeed();
             }
         }
     }

@@ -15,5 +15,7 @@
     <string name="won"> won</string>
     <string name="restart">Restart</string>
     <string name="menu">Menu</string>
+    <string name="dialog_pong1player_player_win">Congratulation you won</string>
+    <string name="dialog_pong1player_ai_win">You lose</string>
 
 </resources>

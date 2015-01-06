@@ -180,7 +180,7 @@ public class PongTwoPlayer extends Activity implements View.OnTouchListener, Pon
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog){
+     public void onDialogPositiveClick(DialogFragment dialog){
         surfaceView.resume();
         createBall();
         p1Score = 0;
