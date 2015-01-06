@@ -1,14 +1,13 @@
 package dk.simwir.pingpong;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -16,8 +15,10 @@ import android.view.View;
 
 import java.util.Random;
 
+import dk.simwir.pingpong.dialogs.WallLoseDialogFragment;
 
-public class Wall extends ActionBarActivity implements View.OnTouchListener{
+
+public class Wall extends ActionBarActivity implements View.OnTouchListener, WallLoseDialogFragment.LoseDialogListener{
 
     wallSurface surfaceView;
     DisplayMetrics metrics;
@@ -40,7 +41,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener{
     private void createBall(){
         Random r = new Random();
         resetBall();
-        ballSpeed = metrics.heightPixels / 140;
+        ballSpeed = metrics.heightPixels / 1400;
         ballMoveRight = r.nextInt(2)==1;
     }
 
@@ -92,22 +93,30 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener{
     }
 
     private float getBallSpeed() {
-        if(score < 10){
-            return ballSpeed;
-        }else if(score >=10 && score < 15){
-            return ballSpeed * 2;
-        }else if(score >= 15 && score < 20){
-            return  ballSpeed * 3;
-        }else if(score >=20 && score < 30){
-            return  ballSpeed * 4;
+        if(score == 0){
+            return ballSpeed * 15;
         }else{
-            return ballSpeed * 5;
+            return ballSpeed * (15 + score);
         }
     }
 
     private void ballLost(){
-        resetBall();
-        score=0;
+        DialogFragment newFragment = WallLoseDialogFragment.newInstance(score);
+        newFragment.show(getFragmentManager(), "lost");
+        newFragment.setCancelable(false);
+        surfaceView.pause();
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog){
+        surfaceView.resume();
+        createBall();
+        score = 0;
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog){
+        finish();
     }
 
 
@@ -191,8 +200,10 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener{
             //Determent if the ball has hit the paddle
             if(by + br > canvas.getHeight() - (canvas.getHeight() / 25) * 2 && bx > x - canvas.getWidth() / 8 && bx < x + canvas.getWidth() / 8){
                 if(by - br < canvas.getHeight() - (canvas.getHeight() / 25) * 2){
-                    ballMoveDown = false;
-                    score++;
+                    if(ballMoveDown){
+                        ballMoveDown = false;
+                        score++;
+                    }
                 }
             }else if(by-br <= 0) ballMoveDown=true;
 
