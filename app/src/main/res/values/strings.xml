@@ -20,5 +20,7 @@
     <string name="title_activity_wall">Wall</string>
     <string name="bWall">Wall</string>
     <string name="dialog_wall_game_over">Game over, your score was </string>
+    <string name="dialog_wall_your_highscore">Your highscore is</string>
+    <string name="dialog_wall_new_highscore">NEW HIGHSCORE!</string>
 
 </resources>

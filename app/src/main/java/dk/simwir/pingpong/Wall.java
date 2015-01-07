@@ -2,6 +2,7 @@ package dk.simwir.pingpong;
 
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -26,6 +27,11 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
     int ballSpeed = 15;
     int score;
     boolean ballMoveDown, ballMoveRight;
+    boolean overlay = false;
+    SharedPreferences sharedPreferences;
+
+    public static final String PREFERENCES = "wallpreferences";
+    public static final String HIGHSCORE = "highscore";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,8 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
 
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
     }
 
     private void createBall(){
@@ -101,15 +109,32 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
     }
 
     private void ballLost(){
-        DialogFragment newFragment = WallLoseDialogFragment.newInstance(score);
-        newFragment.show(getFragmentManager(), "lost");
-        newFragment.setCancelable(false);
-        surfaceView.pause();
+        if(!overlay) {
+            int highscore = sharedPreferences.getInt(HIGHSCORE, 0);
+            if (highscore < score) {
+                saveHighScore();
+                highscore = score;
+            }
+
+            DialogFragment newFragment = WallLoseDialogFragment.newInstance(score, highscore);
+            newFragment.show(getFragmentManager(), "lost");
+            newFragment.setCancelable(false);
+            surfaceView.pause();
+            overlay = true;
+        }
+    }
+
+    private void saveHighScore(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(HIGHSCORE, score);
+
+        editor.commit();
     }
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog){
         surfaceView.resume();
+        overlay = false;
         createBall();
         score = 0;
     }
