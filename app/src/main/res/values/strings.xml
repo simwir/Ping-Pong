@@ -16,5 +16,16 @@
     <string name="paddle_size">Paddle size:</string>
     <string name="ball_speed">Ball speed:</string>
     <string name="ball_size">Ball size</string>
+    <string name="dialog_pong2player_win">Congratulations player </string>
+    <string name="won"> won</string>
+    <string name="restart">Restart</string>
+    <string name="menu">Menu</string>
+    <string name="dialog_pong1player_player_win">Congratulation you won</string>
+    <string name="dialog_pong1player_ai_win">You lose</string>
+    <string name="title_activity_wall">Wall</string>
+    <string name="bWall">Wall</string>
+    <string name="dialog_wall_game_over">Game over, your score was </string>
+    <string name="dialog_wall_your_highscore">Your highscore is</string>
+    <string name="dialog_wall_new_highscore">NEW HIGHSCORE!</string>
 
 </resources>

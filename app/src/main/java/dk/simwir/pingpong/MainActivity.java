@@ -9,7 +9,7 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
-    Button bPong1Player, bPong2Player, bJuggle;
+    Button bPong1Player, bPong2Player, bJuggle, bWall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -27,6 +27,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         bPong2Player.setOnClickListener(this);
         bJuggle = (Button) findViewById(R.id.bJuggle);
         bJuggle.setOnClickListener(this);
+        bWall = (Button) findViewById(R.id.bWall);
+        bWall.setOnClickListener(this);
     }
 
 
@@ -44,6 +46,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
             case (R.id.bJuggle):
                 Intent openJuggle = new Intent(MainActivity.this, Juggle.class);
                 startActivity(openJuggle);
+                break;
+            case (R.id.bWall):
+                Intent openWall = new Intent(MainActivity.this, Wall.class);
+                startActivity(openWall);
                 break;
 
         }

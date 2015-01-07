@@ -9,20 +9,19 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".PongSinglePlayer"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".PongTwoPlayer"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_pong_two_player"
             android:screenOrientation="portrait">
             >
@@ -34,6 +33,10 @@
         <activity
             android:name=".PongTwoPlayerSettings"
             android:label="@string/title_activity_pong_two_player_settings">
+        </activity>
+        <activity
+            android:name=".Wall"
+            android:label="@string/title_activity_wall" >
         </activity>
     </application>
 
