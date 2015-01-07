@@ -8,8 +8,8 @@ android {
         applicationId "dk.simwir.pingpong"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 3
-        versionName "0.003"
+        versionCode 4
+        versionName "0.0031"
     }
     buildTypes {
         release {
