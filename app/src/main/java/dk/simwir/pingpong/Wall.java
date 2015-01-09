@@ -23,7 +23,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
 
     wallSurface surfaceView;
     DisplayMetrics metrics;
-    float x, bx, by, br;
+    float x, bx, by, br, curveFactor;
     int ballSpeed = 15;
     int score;
     boolean ballMoveDown, ballMoveRight;
@@ -58,6 +58,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
         by = metrics.heightPixels / 2;
         br = metrics.heightPixels / 50;
         ballMoveDown = false;
+        curveFactor=1;
     }
 
     @Override
@@ -243,7 +244,25 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
                 bx -= getBallSpeed();
             }
         }
+        private void setCurve(Canvas canvas){
 
+            //if the ball has hit the dead zone
+            if(x - canvas.getWidth() / 8/4<bx && x + canvas.getWidth() / 8/4>bx){
+
+            //if the ball is on the left side of the middle og the paddle
+            }else if(x - canvas.getWidth() / 8>bx){
+                if(ballMoveRight){
+                    curveFactor =
+                }else{
+
+                }
+            //if the ball is on the right side of the middle of the paddle
+            }else if(x + canvas.getWidth() / 8<bx){
+
+            }
+
+
+        }
 
     }
 
