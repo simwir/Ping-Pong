@@ -23,9 +23,9 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
 
     wallSurface surfaceView;
     DisplayMetrics metrics;
-    float x, bx, by, br, curveFactor;
+    float x, bx, by, br;
     int ballSpeed = 15;
-    int score;
+    int score, curveFactor;
     boolean ballMoveDown, ballMoveRight;
     boolean overlay = false;
     SharedPreferences sharedPreferences;
@@ -229,6 +229,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
                     if(ballMoveDown){
                         ballMoveDown = false;
                         score++;
+                        setCurve(canvas);
                     }
                 }
             }else if(by-br <= 0) ballMoveDown=true;
@@ -236,7 +237,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
             if(ballMoveDown){
                 by += getBallSpeed();
             }else{
-                by -= getBallSpeed();
+                by -= getBallSpeed()*curveFactor;
             }
             if(ballMoveRight){
                 bx += getBallSpeed();
@@ -245,14 +246,27 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
             }
         }
         private void setCurve(Canvas canvas){
+            double curvePct, curve;
+            int test;
+
 
             //if the ball has hit the dead zone
-            if(x - canvas.getWidth() / 8/4<bx && x + canvas.getWidth() / 8/4>bx){
-
-            //if the ball is on the left side of the middle og the paddle
+            //if(x - canvas.getWidth() / 8/4<bx && x + canvas.getWidth() / 8/4>bx) {
+            //    test=1;
+            //if the ball hit the outer points of the paddle
+            //}else
+            if(x - canvas.getWidth()/8+canvas.getWidth()/8/8>bx||x+canvas.getWidth()/8-canvas.getWidth()/8/8<bx){
+                if(ballMoveRight){
+                    ballMoveRight = false;
+                }else{
+                    ballMoveRight = true;
+                }
+                //if the ball is on the left side of the middle og the paddle
             }else if(x - canvas.getWidth() / 8>bx){
                 if(ballMoveRight){
-                    curveFactor =
+                    curvePct = bx / (x-(x-canvas.getWidth()/8)/100);
+                    curve= curveFactor * curvePct /100;
+                    curveFactor = (int) curve;
                 }else{
 
                 }
