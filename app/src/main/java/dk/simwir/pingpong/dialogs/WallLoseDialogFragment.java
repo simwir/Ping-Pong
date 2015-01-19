@@ -16,9 +16,16 @@ public class WallLoseDialogFragment extends DialogFragment{
     private static final String SCORE = "score";
     private static final String HIGHSCORE = "highscore";
 
+    /**
+     * Creates a new instance of the WallLoseDialog, Passing the information needed to show the dialog.
+     * @param score The players score on the current attempt
+     * @param highscore The players highscore on all attempts
+     * @return Returns the fragment needed for creating a new dialog
+     */
     public static WallLoseDialogFragment newInstance(int score, int highscore){
         WallLoseDialogFragment f = new WallLoseDialogFragment();
 
+        //Saves the arguments passed in a fragment so that it can be references when showing the dialog.
         Bundle args = new Bundle();
         args.putInt(SCORE, score);
         args.putInt(HIGHSCORE, highscore);
