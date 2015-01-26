@@ -25,27 +25,34 @@ public class WallLoseDialogFragment extends DialogFragment{
     public static WallLoseDialogFragment newInstance(int score, int highscore){
         WallLoseDialogFragment f = new WallLoseDialogFragment();
 
-        //Saves the arguments passed in a fragment so that it can be references when showing the dialog.
+        //Saves the arguments passed in, in a fragment so that it can be referenced when showing the dialog.
         Bundle args = new Bundle();
         args.putInt(SCORE, score);
         args.putInt(HIGHSCORE, highscore);
         f.setArguments(args);
 
         return f;
-}
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         String message;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
+        //Gets the score and the Highscore from the fragment saved later
         mScore = getArguments().getInt(SCORE);
         mHighscore = getArguments().getInt(HIGHSCORE);
+
+        //True if the score from this game is a new highscore
         if(mHighscore==mScore){
+            //Sets the message to be shown in the dialog
             message = getString(R.string.dialog_wall_new_highscore) + "\n" + getString(R.string.dialog_wall_your_highscore) + " " + mHighscore;
         }else{
+            //Sets the message to be shown in the dialog
             message = getString(R.string.dialog_wall_game_over) + " " + mScore + "\n" + getString(R.string.dialog_wall_your_highscore)+ " " + mHighscore;
         }
+        //Sets the message to the message specefied above and sets the positive button to "Restart"
+        //and negative button to "Menu"
         builder.setMessage(message).setPositiveButton(R.string.restart, new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which){
@@ -62,6 +69,9 @@ public class WallLoseDialogFragment extends DialogFragment{
 
     LoseDialogListener mListener;
 
+    /**
+     * An interface that makes the activity handle the button press
+     */
     public interface LoseDialogListener{
         public void onDialogPositiveClick(DialogFragment dialog);
 

@@ -204,6 +204,7 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
          * Terminates the thread that runs the surface view
          */
         public void stop() {
+            //TODO is this needed?
             //while(true){
             try{
                 thread.join();
