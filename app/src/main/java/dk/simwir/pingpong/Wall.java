@@ -29,7 +29,6 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
     boolean ballMoveDown, ballMoveRight;
     boolean overlay = false;
     SharedPreferences sharedPreferences;
-    double curveFactor;
 
     public static final String PREFERENCES = "wallpreferences";
     public static final String HIGHSCORE = "highscore";
@@ -64,8 +63,6 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
         br = metrics.heightPixels / 50;
         //makes the ball move up
         ballMoveDown = false;
-        //resets the cur to be 1:1
-        curveFactor=1;
     }
 
     @Override
@@ -295,8 +292,6 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
                         ballMoveDown = false;
                         //Adds one to the score
                         score++;
-                        //Changes the curve of the ball
-                        setCurve(canvas);
                     }
                 }
             //Determent if the ball has hit the top
@@ -304,9 +299,9 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
 
             //Moves the ball
             if(ballMoveDown){
-                by += getBallSpeed()*curveFactor;
+                by += getBallSpeed();
             }else{
-                by -= getBallSpeed()*curveFactor;
+                by -= getBallSpeed();
             }
             if(ballMoveRight){
                 bx += getBallSpeed();
@@ -314,69 +309,6 @@ public class Wall extends ActionBarActivity implements View.OnTouchListener, Wal
                 bx -= getBallSpeed();
             }
         }
-
-        /**
-         * Changes the factor at which the ball moves on the x and y.
-         * When a new game is started this is 1:1
-         * @param canvas The canvas on which the ball is
-         */
-        private void setCurve(Canvas canvas){
-            double curvePct, curve;
-
-
-            //if the ball has hit the dead zone, The center 1/4 of the paddle
-            if(x - canvas.getWidth() / 8/4<bx && x + canvas.getWidth() / 8/4>bx) {
-            //if the ball hit the outer points of the paddle, thus returning it top the way it came
-            }else if(x - canvas.getWidth()/8+canvas.getWidth()/8/8>bx||x+canvas.getWidth()/8-canvas.getWidth()/8/8<bx){
-                if(ballMoveRight){
-                    ballMoveRight = false;
-                }else{
-                    ballMoveRight = true;
-                }
-            //if the ball is left of the middle of the paddle
-            }else if(x - canvas.getWidth() / 8<bx && x > bx){
-
-                if(ballMoveRight){
-                    curvePct = bx / (x-(x-canvas.getWidth()/8)/100);
-                    curve= curveFactor * (1+0.5*curvePct);
-                    curveFactor = curve;
-                    curveLimit();
-                }else{
-                    curvePct = bx / (x-(x-canvas.getWidth()/8)/100);
-                    curve= curveFactor * curvePct;
-                    curveFactor = curve;
-                    curveLimit();
-                }
-            //if the ball is right of the middle of the paddle
-            }else if(x + canvas.getWidth() / 8>bx && x < bx){
-                //If the ball is moving right or not
-                if(ballMoveRight){
-                    curvePct = bx / (x-(x+canvas.getWidth()/8)/100);
-                    curve= curveFactor * curvePct;
-                    curveFactor = curve;
-                    curveLimit();
-                }else{
-                    curvePct = bx / (x-(x+canvas.getWidth()/8)/100);
-                    curve= curveFactor * (1+0.5*curvePct);
-                    curveFactor = curve;
-                    curveLimit();
-                }
-            }
-
-
-        }
-
-        /**
-         * The factor at which the ball can move is between 1:0.5 - 1:2
-         */
-        private void curveLimit() {
-            if(curveFactor<0.5){
-                curveFactor = 0.5;
-            }else if(curveFactor > 2){
-                curveFactor = 2;
-            }
-        }
-
     }
 
 
