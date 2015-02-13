@@ -2,14 +2,21 @@ package dk.simwir.pingpong;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+/*
+    Copyright © 2015  Simon Virenfeldt
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ */
 public class MainActivity extends Activity implements View.OnClickListener{
 
     Button bPong1Player, bPong2Player, bJuggle, bWall;
@@ -45,10 +52,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
             case R.id.bPong2Player:
                 Intent openPong2Player = new Intent(MainActivity.this, PongTwoPlayer.class);
                 startActivity(openPong2Player);
-                break;
-            case (R.id.bJuggle):
-                Intent openJuggle = new Intent(MainActivity.this, Juggle.class);
-                startActivity(openJuggle);
                 break;
             case (R.id.bWall):
                 Intent openWall = new Intent(MainActivity.this, Wall.class);
