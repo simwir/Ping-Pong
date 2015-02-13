@@ -35,8 +35,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         bPong1Player.setOnClickListener(this);
         bPong2Player = (Button) findViewById(R.id.bPong2Player);
         bPong2Player.setOnClickListener(this);
-        bJuggle = (Button) findViewById(R.id.bJuggle);
-        bJuggle.setOnClickListener(this);
         bWall = (Button) findViewById(R.id.bWall);
         bWall.setOnClickListener(this);
     }

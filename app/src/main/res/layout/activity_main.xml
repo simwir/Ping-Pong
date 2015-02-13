@@ -48,14 +48,6 @@
             android:text="@string/bWall"
             android:id="@+id/bWall"
             android:layout_gravity="center_horizontal" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/bJuggle"
-            android:id="@+id/bJuggle"
-            android:layout_gravity="center_horizontal"
-            android:enabled="false" />
     </LinearLayout>
 
 </RelativeLayout>
