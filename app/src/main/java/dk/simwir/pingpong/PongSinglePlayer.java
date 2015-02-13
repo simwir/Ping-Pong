@@ -366,7 +366,7 @@ public class PongSinglePlayer extends Activity implements View.OnTouchListener, 
          * @param canvas The canvas on where the ball is drawn.
          */
         private void moveBall(Canvas canvas){
-            //If the ball have moved out the button
+            //If the ball have moved out the bottom
             if(by - br > canvas.getHeight()){
                 resetBall();
                 p2Score++;
