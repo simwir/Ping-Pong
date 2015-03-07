@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 /*
     Copyright © 2015  Simon Virenfeldt
 
@@ -19,7 +21,7 @@ import android.widget.Button;
  */
 public class MainActivity extends Activity implements View.OnClickListener{
 
-    Button bPong1Player, bPong2Player, bJuggle, bWall;
+    Button bPong1Player, bPong2Player, bWall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -27,6 +29,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         setContentView(R.layout.activity_main);
 
         init();
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     private void init(){

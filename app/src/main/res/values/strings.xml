@@ -22,5 +22,8 @@
     <string name="dialog_wall_game_over">Game over, your score was </string>
     <string name="dialog_wall_your_highscore">Your highscore is</string>
     <string name="dialog_wall_new_highscore">NEW HIGHSCORE!</string>
+    <!-- Get test ads: ca-app-pub-3940256099942544/6300978111
+        Get real ads: ca-app-pub-1669617099600580/8659980157-->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
 </resources>
